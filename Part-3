@@ -1,3 +1,9 @@
+==================================
+# RDS-ElasticCache-Aurora
+# Non-RDS-NoSQL-DynamoDB-DAX
+# Database Migration service
+# Elastic Map Reduce - EMR
+=================================
 
 	1. Relational databases on AWS - RDS: (Exam Tips)
 		1.1 SQL Server
@@ -347,3 +353,111 @@
 		- API Gateway
 		- ElastiCache - Memcached and Redis
 		- DynamoDB Accelerator (DAX)
+		
+		
+** Elastic Map Reduce (EMR) Overview - Exam Tips
+
+	1. Amazon EMR is the industry-leading cloud big data platform for processing vast amounts of data using open-source tools such as Apache Spark, Apache Hive, Apache HBase, Apache Flink, Apache Hudi and Presto.
+	   With EMR, you can run petabyte-scale analysis at less than half the cost of traditional on-premises solutions and over three times faster than standard Apache Spark.
+	   
+	2. The central component of Amazon EMR is the cluster. A cluster is a collection of Amazon EC2 instances. Each instance in the cluster is called a node.
+	   Each node has a role within the cluster, referred to as the node type.
+	   
+	   Amazon EMR also installs different software components on each node type, giving each node a role in a distributed application like Apache Hadoop.
+	   
+	3. The node types in Amazon EMR are as follows:
+	
+		- Master node: 
+			A node that manages the cluster. The master node tracks the status of tasks and monitors the health of the cluster. Every cluster has a master node.
+		  By default - log data is stored on the master node.
+
+		- Core node: 
+			A node with software components that runs tasks and stores data in the Hadoop Distributed File System (HDFS) on your cluster.
+		  Mutli-node clusters have at least one core node.
+
+		- Task node: A node with software components that only runs tasks and does not store data in HDFS. Task nodes are optional.
+	
+		Exam Question: With EMR, if we lose the master node, we lose everything. So how we save the logs of /mnt/var/log
+		- You can configure a cluster to periodically archive the log files stored on the master node to Amazon S3. This ensures the log files are available after the cluster terminates, whether this is through normal shutdown or due to an error. 
+		- Amazon EMR archives the log files to Amazon S3 at five-minute intervals.
+		- We can set this up only when we create the cluster and not after creating the cluster.			 
+
+** Database Summary	(Exam Tips)	
+		1. Relational databases on AWS - RDS: 
+			1.1 SQL Server
+			1.2 Oracle
+			1.3 PostgreSQL
+			1.4 MySQL
+			1.5 Aurora
+			1.6 MariaDB
+			
+		2. DynamoDB
+		
+		3. Redshift OLAP	
+		
+		4. Elasticache
+			4.1 Memcached
+			4.2 Redis
+			
+		5. Remember the following points:
+				5.1 RDS runs on virtual machines
+				5.2 You cannot log in to these operating systems however
+				5.3 Patching of the RDS OS and DB is Amazon's responsibility
+				5.4 RDS is not serverless
+				5.5 Aurora Serverless and DynamoDB are serverless
+		
+		6. There are two different types of Backups for RDS:
+				6.1 Automated Backups
+				6.2 Database Snapshots
+				
+		7. Read Replicas
+				7.1 Can be Multi-AZ
+				7.2 Used to increase performance
+				7.3 Must have backups turned on.
+				7.4 Can be in different regions
+				7.5 Can be MySQL, PostgreSQL, MariaDB, Oracle and Aurora
+				7.6 Can be promoted to master, this will break the Read Replica.
+				
+		8. MultiAZ
+				8.1 Used for DR
+				8.2 You can force a failover from one AZ to another by rebooting the RDS instance.
+				
+		9. Encryption at rest is supported for MySQL, Oracle, SQL Server, PostgreSQL, MariaDB & Aurora. 
+		   Encryption is done using the AWS Key Management Service (KMS). Once your RDS instance is encrypted, the data stored at rest in the underlying storage is encrypted,
+		   As are its automated backups, read replicas, and snapshots.		
+		
+	   10. DynamoDB
+				- Stored on SSD Storage.
+				- Spread across 3 geographically distinct data centers.
+				- Eventual Consistent Reads (Default): Consistency across all copies of data is usually reached within a second. Repeating a read after a short time should return the updated data. (Best Read Performance)
+				- Strongly Consistent Reads: A strongly consistent read returns a result that reflects all writes that received a successful response prior to the read.
+
+	   11. Redshift			
+			- Redshift is used for Business Intelligence.
+			- Available in only 1 AZ.
+			- Enabled by default with a 1 day retention period.
+			- Maximum retention period is 35 days.
+			- Redshift always attempts to maintain at least three copies of your data (the original and replica on the compute nodes and a backup in Amazon S3).
+			- Redshift can also asynchronously replicate your snapshots to S3 in another region for DR.
+
+		12. Aurora	
+			- 2 copies of your data is contained in each availability zone, with minimum of 3 availability zones. 6 copies of your data.
+			- You can share Aurora snapshots with other AWS accounts
+			- Three types of Aurora Replicas are available:
+				1. Aurora Replicas (currently 15)
+				2. MySQL Read Replicas (currently 5)
+				3. PostgreSQL (currently 1)
+			- Automated failover is only available with Aurora Replicas
+			- Automated backups are always enabled on Amazon Aurora DB Instances. Backups do not impact performance.
+			- You can also take snapshots with Aurora. This also does not impact on performance.
+			- You can share Aurora snapshots with other AWS accounts
+			- Use Amazon Aurora Serverless if you want a simple cost-effective option for infrequent, intermittent, or unpredictable workloads.  
+		  
+		13. Elasticache
+
+			- Use Elasticache to increase database and web application performance.
+			- Redis is Multi-AZ
+			- You can do backups and restore of Redis
+			- If you need to scale horizontally, use Memcached
+
+** Deploying an Amazon RDS Multi-AZ and Read Replica in AWS (Lab)
