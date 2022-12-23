@@ -1,0 +1,192 @@
+===================================
+# AWS Directory Seervices
+# IAM Policies
+# Resource Access Manager (RAM)
+# AWS single signon (SSO) - SAML
+=====================================
+
+
+** AWS Directory Service
+	- Family of managed services
+	- Connect AWS resources with on-premises AS
+	- Standalone directory in the cloud
+	- Use existing corporate credentials
+	- SSO to any domain-joined EC2 instance
+	
+	What is Active Directory?
+		- On-premises directory service
+		- Hierarchical database of users, groups, computers - trees and forests
+		- Group Policies
+		- LDAP and DNS
+		- Kerberos, LDAP and NTLM authentication
+		- Highly available
+
+	AWS Managed Microsoft AD
+		- AD domain controllers (DCs) running Windows server
+		- Reachable by application in your VPC
+		- Add DCs for HA and performance
+		- Exclusive access to DCs
+		- Extend existing AD to on-premises using AD Trust
+		- AWS manages
+			1. Mutli-AZ deployment
+			2. Patch, monitor, recover
+			3. Instance rotation
+			4. Snapshot and restore
+		- Customer manages
+			1. Users, Groups and GPOs
+			2. Standard AD tools
+			3. Scale out DCs
+			4. Trusts (resource forest)
+			5. Certificate authorities (LDAPS)
+			6. Federation
+			
+		- Simple AD
+			1. Standalone managed directory
+			2. Basic AD features
+			3. Small: <= 500; Large <= 5K users	
+			4. Easier to manage EC2
+			5. Linux workloads that need LDAP
+			6. Does not support trusts (can't join on-premises AD)
+		
+		- AD Connector
+		  1. Directory gateway (proxy) for on-premises AD
+			2. Avoid caching information in the cloud
+			3. Allow on-premises users to log in to AWS using AD
+			4. Join EC2 instances to your existing AD domain
+			5. Scale across multiple AD Connectors.	
+
+		- Cloud Directory	
+			1. Directory-based store for developers
+			2. Multiple hierarchies with hundreds of millions of objects
+			3. Use cases: org charts, course catalogs, device registries
+			4. Full managed service
+			
+		- Amazon Cognito User Pools
+			1. Managed user directory for SaaS applications
+			2. Sign-up and Sign-in for web or mobile
+			3. Works with social media identities
+		
+		Exam Tips:
+			AD Compatible:
+				- Managed Microsoft AD (a.k.a. Directory Service for Microsoft AD)
+				- AD Connector
+				- Simple AD
+				These allow to logon to Amazon workspaces and QuickSight with your AD credentials
+				
+			    Exam Question: Logging into workspaces or QuickSight with AD credentials, think about the AD compatible services here.
+				
+			Not AD Compatible
+				- Cloud Directory
+				- Cognito User pools
+				
+				If you are a developer and you don't need AD, you can use Cloud Directory to create directories that organise and manage hierarchical information and 
+				Cognito user pools work with mobile and web
+
+** IAM Policies - this lesson cover IAM boundaries and how to IAM evaluates policies
+
+		* Amazon Resource Name (ARN)
+			- ARN's are unique and all ARNs begin with arn:partition:service:region:account_id
+			- and end with:
+				resource
+				resource_type/resource
+				resource_type/resource/qualifier
+				resource_type/resource:qualifier
+				resource_type:resource
+				resource_type:resource:qualifier
+				
+			Examples:
+					arn:aws:iam::123456789012:user/sri <-- :: region is omitted because IAM is global
+					arn:aws:s3:::my_awesome_bucket/image.png <-- ::: - no region, no account id needed to identify an object in S3. all objects in S3 are globally unique
+					arn:aws:dynamodb:us-east-1:123456789012:table/orders
+					arn:aws:ec2:us-east-1:123456789012:instance/* - wildcard. EC2 is a regional service
+
+		* IAM Policies
+			- JSON document that defines permissions
+			- Identity policy
+			- Resource policy
+			- No effect until attached to an identity or a resource
+			- A policy is a list of statements
+			- Each statement matches an AWS API request
+			- Statement has Sid, Effect: Allow/Deny, Action is the API and Resource is the action is against.
+			- Inline policy is just limited to the role and not available outside that role, typically it's not a best practise to use.
+
+		Exam Tips:
+			- Anything not explicitly allowed == implicitly denied
+			- Explicit deny > everything else (overrides any other allows)
+			- Only attached policies have effect
+			- AWS joins all applicable policies. (When we use multiple policies)
+			- AWS-managed vs. Customer-managed
+		
+		Permission Boundaries
+			- Used to delegate administration to other users.
+			- Prevent privilege escalation or unnecessarily broad permissions
+			- Control max permissions an IAM policy can grant
+			- Use Cases
+				1. Developers creating roles for LAMBDA functions
+				2. Application owners creating roles for EC2 instances
+				3. Admins creating ad hoc users
+				
+** AWS Resource Access Manager (RAM)
+		
+		- AWS Resource Access Manager (RAM) allows resource sharing between accounts (individual accounts or AWS organisation)
+		- Which AWS resources can I share using RAM (Check AWS for the latest: https://docs.aws.amazon.com/ram/latest/userguide/shareable.html)
+			1. AWS App Mesh
+			2. Amazon Aurora
+			3. AWS Certificate Manager Private Certificate Authority
+			4. AWS CodeBuild
+			5. Amazon EC2
+			6. EC2 Image Builder
+			7. AWS Glue
+			8. AWS License Manager
+			9. AWS Network Firewall
+		 10. AWS Outposts
+		 11. AWS Resource Groups
+		 12. Amazon Route 53
+		 13. Amazon VPC
+			
+			Example: Create a Resource using account 1 and the account 2 need to accept the resource sharing before they can start using the resource.
+			
+** AWS Single Sign-On
+
+		- Single Sign-On (SSO) service helps centrally manage access to AWS accounts and business applications.
+
+	* AD and SAML Integration:
+	
+		- On-premises AD -> AWS SSO (Security Assertion Markup Language - SAML) - lets you access the apps or OU or SAML 2.0 enabled applications.
+		  All activity is logged in CloudTrail
+		  
+		  Exam Tip: If you see SAML in the question, look for SSO in the answers
+
+** Advanced IAM Summary	(Exam Tips)			  
+	
+	- AD
+	- Connect AWS resources with on-premises AD
+	- SSO to any domain-joined EC2 instance
+	- AWS Managed Microsoft AD
+	- AD Trust - Extend existing AD to on-premises AD using AD Trust
+	- AWS vs customer responsibility
+	- Simple AD (trusts are not supported)
+	- You can use AD Connector
+	- Cloud Directory (has nothing to do with AD)
+	- Cognito user pools (also has nothing to do with AD)
+	- AD vs Non-AD Compatible services
+	- IAM Policies
+		- ARN
+		- IAM Policy Structure
+		- Effect/Action/Resource
+		- Identity vs. resource policies
+		- Policy evaluation logic (when we have multiple policies assigned to a role, DENY always overrides the ALLOW)
+		- AWS Managed (can't be edited by users) vs. Customer managed policies
+		- Permission boundaries (do not deny or allow permission on their own, they defined max permission an identity can have)
+	- Resource Access Manager (RAM)
+		- Resource Sharing between accounts
+		- Individual accounts and AWS Organisations
+		- Types of resources you can share (remember not all AWS services are available in resource access manager)
+	- SSO
+		- Centrally manage access
+		Exam Scenarios for SSO:
+			- G Suite, Office 365, Salesforce
+			- Use existing identities
+			- Account-level permissions
+			- SAML, If you see SAML in the question, look for SSO in the answers.
+			
