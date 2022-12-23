@@ -1,0 +1,155 @@
+========================
+Serverless
+
+Lambda
+X-ray
+ECS
+EKS
+ECR
+==========================
+
+
+
+	** Lambda - Exam Tips
+		- Lambda scales out (not up) automatically
+		- Lambda is serverless
+		- Lambda functions are independent, 1 event = 1 functions
+		- Know what services are serverless (Aurora Serverless (Only RDS), DynamoDB, S3, Lambda, API Gateway are serverless. EC2 and RDS are not serverless).
+		- Lambda functions can trigger other lambda functions, 1 event can = x functions if functions can trigger other functions.
+		- Architectures can get extremely complicated, AWS X-ray allows you to debug what is happening.
+		- Lambda can do things globally, you can use it to back up S3 buckets to other S3 buckets etc
+		- Know Lambda triggers, RDS can't trigger Lambda (check AWS to confirm) - Important for the Exam
+		
+	** Build a Serverless Web Page
+	
+	** Lets Build an Alexa Skill
+	
+	** Serverless Application Model (SAM)
+		- CloudFormation extension optimised for serverless applications
+		- New Types: functions, APIs, tables
+		- Supports anything that CloudFormation supports
+		- Run serverless application locally using docker
+		- Package and deploy using CodeDeploy
+	
+	** Elastic Container Service (ECS) 
+
+		What are Containers and Docker?
+			- A container is a package that contains an application, libraries, runtime and tools required to run it
+			- Run on a container engine like Docker
+			- Provides the isolation benefits of virtualisation with less overhead and faster starts than VMs
+			- Containerised applications are portable and offer a consistent environment. Which allocate memory and CPU per container.
+		
+		What is ECS?
+			- Managed container orchestration service.
+			- Create clusters to manage fleets of container deployments
+			- EC2 manages EC2 or Fargate instances
+			- Schedules containers for optimal placement
+			- Defines rules for CPU and memory requirements
+			- Monitors resource utilisation
+			- Deploy, update and roll back
+			- Free... for real!, However we pay for the resources that are provisioned.
+			- Integrates with VPC, security groups, EBS volumes and ELB
+			- CloudTrail and CloudWatch
+		
+		ECS Components:
+			- Cluster: Logical collection of ECS resources - either ECS EC2 instances or Fargate instances
+			
+			- Task Defintion: Defines your application. Similar to a Dockerfile but for running containers in ECS. Can contain multiple containers.
+			
+			- Container Definition:	Inside a task defintion, it defines the individual container a task uses. Controls CPU and memory allocation and port mappings.			
+			
+			- Task: Single running copy of any containers defined by a task definition. One working copy of an application (e.g., DB and web containers)
+			
+			- Service: Allows tasks definitions to be scaled by adding tasks. Defines minimum and maximum values.
+			
+			- Registry:	Storage for container images (e.g, Elastic Container Registry (ECR) or Docket Hub). Used to download images to create containers.			
+			
+		Fargate
+			- Serverless container engine
+			- Eliminates need to provision and manage servers
+			- Works with both ECS and EKS
+			- Each workload runs in its own kernel
+			- Isolation and security
+			- Choose EC2 instead if
+				- Compliance requirements
+				- Require broader customisation
+				- Applications require GPU
+		
+		EKS
+			- Elastic Kubernetes Service
+			- K8s is open-source software that lets you deploy and manage containerised applications at scale
+			- Same toolset on-premises and in cloud
+			- Containers are grouped in pods.		
+			- Like ECS, supports both EC2 and Fargate
+			- Why use EKS?
+				- Already using K8s
+				- Want to migrate to AWS
+		
+		ECR
+			- Managed Docker container registry
+			- Store, manage and deploy images
+			- Integrated with ECS and EKS
+			- Works with on-premises deployments
+			- Highly available
+			- Integrated with IAM
+			- Pay for storage and data transfer
+		
+		ECS + ELB
+			- Distribute traffic evenly across tasks in your service
+			- Supports ALB, NLB, CLB
+			- Use ALB to route HTTP/HTTPS (layer 7) traffic 
+			- Use NLB or CLB to route TCP (layer 4) traffic
+			- Supported by both EC2 and Fargate launch types.
+			- ALB allows:
+				- Dynamic host port mapping
+				- Path-based routing
+				- Priority rules
+			- ALB is recommended over NLB or CLB	
+		
+		ECS Security (Imp for the Exam)
+			- Instance Roles vs Task Roles
+				- Instance Roles - applies policy to all tasks running on EC2 instance (for ex: S3 access), which is not ideal for security.
+				- Task Roles - Applies policies per task (for ex: Role A: S3 only, Role B: S3 + DynamoDB). which is ideal for security.
+		
+	** Serverless Summary
+		 - Traditional vs Serverless Architecture
+		 - Go for Serveless Model with API Gateway, Lambda and DynamoDB
+		 - Lambda Exam Tips:
+		 	- Lambda scales out (not up) dynamically
+			- Lambda functions are independent, 1 event = 1 functions
+			- Lambda is serverless
+			- Know what services are serverless! RDS is not serverless with the exception of Aurora Serverless
+			- Lambda functions can trigger other lambda functions, 1 event can = x functions if functions trigger other functions.
+			- Architectures can get extremely complicated, AWS X-ray allows you to debug what is happening.
+			- Lambda can do things globally, you can use it to back up S3 buckets to other S3 buckets etc.
+			- Know your triggers and know what can't be triggered from Lambda.
+			- Which of the following services can invoke a Lambda function synchronously?
+			  Answer: ALB, Cognito, Lex, Alexa, API Gateway, CloudFront, and Kinesis Data Firehose are all valid direct (synchronous) triggers for Lambda functions. S3 is one of the valid asynchronous triggers.
+			
+			- Source: https://docs.aws.amazon.com/lambda/latest/dg/lambda-services.html
+
+				Services That Lambda Reads Events From
+					Amazon Kinesis
+					Amazon DynamoDB
+					Amazon Simple Queue Service
+
+				Services That Invoke Lambda Functions Synchronously
+					Elastic Load Balancing (Application Load Balancer)
+					Amazon Cognito
+					Amazon Lex
+					Amazon Alexa
+					Amazon API Gateway
+					Amazon CloudFront (Lambda@Edge)
+					Amazon Kinesis Data Firehose
+					AWS Step Functions
+
+				Services That Invoke Lambda Functions Asynchronously
+					Amazon Simple Storage Service
+					Amazon Simple Notification Service
+					Amazon Simple Email Service
+					AWS CloudFormation
+					Amazon CloudWatch Logs
+					Amazon CloudWatch Events
+					AWS CodeCommit
+					AWS Config
+					AWS IoT Events
