@@ -1,0 +1,276 @@
+========================
+# SQS
+# SWS
+# SNS
+# Elastic transacoder
+# API Gateway
+# Kineses
+# web identity federation/cognito
+
+=========================
+
+
+	
+	** 	SQS
+		- Amazon SQS is a web service that gives you access to a message queue that can be used to store messages while waiting for a computer to process them
+		- it's a distributed queue system that enables web service applications to quickly and reliably queue messages that one component in the application generates to be consumed by another component
+		- A queue is a temporary repository for messages that are awaiting processing.
+
+		- Using Amazon SQS, you can decouple the components of an application so they run independently, easing message management between components
+		- Any component of a distributed application can store messages in a fail-safe queue.
+		- Messages can contain up to 256KB of text in any format. Any component can later retrieve the messages programmatically using the Amazon SQS API.
+		- Think decoupling infrastructure/micro-services means SQS.
+		- 256KB is not a hard limit and it can go up tp 2GB, however it will be stored in S3
+		- The queue acts as a buffer between the component producing and saving data, and the component receiving the data for processing.
+		- This means the queue resolves issues that arise if the producer is producing work faster than the consumer can process it, or if the producer or consumer are only intermittently connected to the network.
+		
+		- There are 2 types of queues
+			1. Standard Queues (default): A standard queue lets you have a nearly-unlimited number of transactions per second. Standard queues guarantee that a message is delivered at least once.
+			   
+			   Occasionally (because of the highly-distributed architecture that allows high throughput), more than one copy of a message might be delivered out of order.
+			   
+			   However, standard queues provide best-effort ordering which ensures that messages are generally delivered in the same order as they are sent 
+				
+			2. FIFO: The FIFO complement the standard queue.
+			   The most important feature of this queue type are FIFO delivery and exactly-once processing: the order in which messages are sent and received is strictly preserved and a 			   message is delivered once and remains available until a consumer processes and deleted it; duplicates are not introduced into the queue.
+			
+			   FIFO queues also support message groups that allow multiple ordered message groups within a single queue.
+			   
+			   FIFO queues are limited to 300 transactions per second (TPS), but have all the capabilities of standard queues.
+
+		Exam Tips:	
+			- SQS is pull based, not push based.
+			- Messages are 256KB in size
+			- Messages can be kept in the queue from 1 min to 14 days; the default retention period is 14 days.
+			- Visibility timeout is the amount of time that the message is invisible in the SQS queue after a reader picks up that message.
+			  Provided that the job processed before the visibility timeout expires, the message will then be deleted from the queue.
+			  If the job has not processed within that time, the message will become visible again and another reader will process it.
+			  This could result in the same message being delivered twice.
+			- Visibility timeout maximum is 12 hours.
+			
+			  Exam Scenario: A message is being delivered twice, what could be the reason?
+			  Answer: Visibility timeout is not long enough.
+			
+			- SQS guarantees that your messages will be processed at least once.
+			- Amazon SQS long polling is a way to retrieve messages from your Amazon SQS queues. While the regular short polling returns immediately (even if the message queue being 			  polled is empty) , long polling doesn't return a response until a message arrives in the message queue, or the long poll times out. 
+			
+  			Exam Scenario: Your EC2 instances are constantly polling while the queue is empty, so this could increase your costs. How can you reduce the costs?
+			  Answer: Use long polling
+			
+			- Any time you see a scenario based question about "decoupling your infrastructure" - think SQS.  
+			  
+	** Simple Workflow Service
+		- Amazon Workflow Service (Amazon SWF) is a web service that makes it easy to coordinate work across distributed application components.
+		  SWF enables applications for a range of use cases, including media processing, web application back-ends, business process workflows and analytics pipelines, to be designed as 		  a coordination of tasks. 
+		- Tasks represent invocations of various processing steps in an application which can be performed by executable code, web service calls, human actions and scripts. 
+
+		Exam Scenario: Any human interaction required in the service, think of SWF
+		
+		SWF vs SQS:
+			- SQS has a retention period of 14 days; with SWF, workflow executions can last up to 1 year.
+			- Amazon SWF is a task-oriented API. whereas Amazon SQS offers a message-oriented API.
+			- Amazon SWF ensures that a task is assigned only once and is never duplicated. With Amazon SQS, you need to handle duplicated messages and may also need to ensure that a 			  message is processed only once.
+			- Amazon SWF keeps track of all the tasks and events in an application, With Amazon SQS, you need to implement your own application-level tracking, especially if your 			  application uses multiple queues
+		
+		SWF Actors:
+			1. Workflow Starters: An application that can initiate (start) a workflow. Could be your e-commerce website following the placement of order or a mobile app searching for 			   business.
+			2. Deciders: Control the flow of activity tasks in a workflow execution. If something has finished (or failed) in a workflow, a Decider decides what to do next.
+			3. Activity Workers: Carry out the activity tasks.
+	
+	** Simple Notification Service
+		- Amazon Simple Notification Service (Amazon SNS) is a web service that makes it easy to set up, operate and send notifications from the cloud.
+		- It provides developers with highly scalable, flexible and cost-effective capability to publish messages from an application and immediately deliver them to subscribers or other 		  applications.
+		- Push notifications to Apple, Google, Fire OS and Windows devices as well as Android devices in China with Baidu Cloud Push.
+		- Besides pushing cloud notifications directly to mobile devices, Amazon SNS can also deliver notification by SMS text message or email to Amazon SQS or to any HTTP endpoint.
+		- SNS allows you to group multiple recipients using topics. A topic is an "access point for allowing recipients to dynamically subscribe to identical copies of the same 	  		  notification
+		- One topic can support deliveries to multiple endpoint types - for example, you can group together iOS, Android and SMS recipients,
+		  When you publish once to a topic, SNS delivers appropriately formatted copies of your message to each subscriber.
+		
+		Exam Tips:
+			- Instantaneous, push-based delivery (no pull)
+			- Simple APIs and easy integration with applications
+			- Flexible message delivery over multiple transport protocols
+			- Inexpensive, pay-as-you-go model with no up-front costs.
+			- Web-based AWS Management Console offers the simplicity of a point-and-click interface.
+		
+		SNS vs SQS
+			- Both Messaging Services with AWS
+			- SNS - Push
+			- SQS - Poll (Pulls)
+			
+	** Elastic Transcoder - Exam Tips
+		- Media Transcoder in the cloud.
+		- Convert Media files from their original source format in different formats that will play on smartphones, tables, PCS etc.
+		- Provides transcoding presets for popular output formats, which means that you don't need to guess about which settings work best on particular devices.
+		- Pay based on the minutes that you transcode and the resolution at which you transcode.
+		
+	** API Gateway - Exam Tips (5 to 10 questions)
+		- API Gateway is a fully managed service that makes it easy for developers to publish, maintain, monitor and secure APIs at any scale.
+		- API Gateway has caching capabilities to increase performance
+		- API Gateway is low cost and scales automatically
+		- You can throttle API Gateway to prevent attacks
+		- You can log results to CloudWatch
+		- If you are using Javascript/AJAX that uses multiple domains with API Gateway, ensure that you have enable CORS on API Gateway.
+		- CORS is enforced by the client (Browser)
+	
+	** Kinesis 101 (Streaming Data)
+		- Amazon Kinesis is a platform on AWS to send your streaming data to. Kinesis makes it easy to load and analyse streaming data, and also providing the ability to build your own 		  custom applications for your business needs.
+		
+		- 3 different types of Kinesis (Exam Tips)
+			1. Kinesis Streams: Stores data in Shards. (Retention from 24 hours to 7 days). EC2 instances read this data and store it in S3, DynamoDB, RedShift and EMR.
+			   
+			   Kinesis Stream consists of Shards (not imp for the exam)
+			   - 5 transactions per sec for reads, up to a max total data read rate of 2 MB per sec abd up to 1000 records per sec for writes, up to a max total data write of 1 MB per 				 sec (including partition keys)
+			   - The data capacity of your stream is a function of the number of shards that you specify for the stream. The total capacity of the stream is the sum of the capacities of 			     its shards.
+			  
+			2. Kinesis Firehose: Kinesis Firehose has no data persistence, however it processes the data using Lambda and stores it in S3, DynamoDB, RedShift, EMR, Amazon Elasticsearch 			   Service, and Splunk, enabling near real-time analytics with existing business intelligence tools and dashboards you’re already using today.
+			
+			3. Kinesis Analytics: Works with Kinesis Streams and Kinesis Analytics to analyse the data on the fly.
+
+		- Exam Scenario:
+			You must choose the most relevant service.
+			
+	** Web Identity Federation & Cognito (Exam Tips)
+		- Web Identity Federation lets you give your users access to AWS resources after they have successfully authenticated with a web-based identity provider such as Apple, Google and 		  Facebook. Following successful authentication, the user receives an authentication code from the Web ID provider, which they can trade for temporary AWS security credentials.
+		
+		- Amazon Cognito provides Web Identity Federation with the following features
+			- Sign-up and sign-in to your apps
+			- Access for guest users
+			- Acts as an Identity Broker between your application and Web ID providers, so you don't need to write any additional code.
+			- Synchronises user data for multiple devices
+			- Recommended for all mobile applications AWS services.
+		
+		- The user authenticates first with the Web ID Provider and receives an authentication token, which is exchanged for temporary AWS credentials allowing them to assume an IAM role.
+		
+		- Cognito is an Identity Broker which handles interaction between your applications and the Web ID provide (You don't need to write your own code to do this)
+		
+		- User pool is user based, It handles things like user registration, authentication and account recovery
+		
+		- Identity pools authorise access to your AWS resources.
+		
+		- Exam question about difference between User pool and Identity pools	
+		
+	** Event Processing Patterns - Exam Tips
+		- Understand the pub/sub pattern - facilitated by SNS
+		- DLQ - SNS, SQS, Lambda
+		- Fanout pattern - SNS
+		- S3 event notifications - Which events trigger; which services consume
+		
+	** Applications Summary
+		- SQS is a way to de-couple your infrastructure
+		- SQS is pull based not push based
+		- Messages are 256 KB in size
+		- Messages can be kept in the queue from 1 min to 14 days; the default retention period is 4 days.
+		- Standard SQS and FIFO SQS
+		- Standard order is not guaranteed and messages can be delivered more than once.
+		- FIFO order is strictly maintained and messages are delivered only once.
+		- Visibility timeout is the amount of time that the message is invisible in the SQS queue after a reader picks up that message.
+		  Provided that the job processed before the visibility timeout expires, the message will then be deleted from the queue.
+		  If the job has not processed within that time, the message will become visible again and another reader will process it.
+		  This could result in the same message being delivered twice.
+		- Visibility timeout maximum is 12 hours.
+		- SQS guarantees that your messages will be processed at least once.
+		- Amazon SQS long polling is a way to retrieve messages from your Amazon SQS queues. While the regular short polling returns immediately (even if the message queue being 		  		  polled is empty) , long polling doesn't return a response until a message arrives in the message queue, or the long poll times out. 		
+		
+		SWF vs SQS:
+			- SQS has a retention period of 14 days; with SWF, workflow executions can last up to 1 year.
+			- Amazon SWF is a task-oriented API. whereas Amazon SQS offers a message-oriented API.
+			- Amazon SWF ensures that a task is assigned only once and is never duplicated. With Amazon SQS, you need to handle duplicated messages and may also need to ensure that a 			  message is processed only once.
+			- Amazon SWF keeps track of all the tasks and events in an application, With Amazon SQS, you need to implement your own application-level tracking, especially if your 			  application uses multiple queues
+		SWF Actors:
+			1. Workflow Starters: An application that can initiate (start) a workflow. Could be your e-commerce website following the placement of order or a mobile app searching for 			   business.
+			2. Deciders: Control the flow of activity tasks in a workflow execution. If something has finished (or failed) in a workflow, a Decider decides what to do next.
+			3. Activity Workers: Carry out the activity tasks.
+		
+		SNS Benefits:
+			- Instantaneous, push-based delivery (no pull)
+			- Simple APIs and easy integration with applications
+			- Flexible message delivery over multiple transport protocols
+			- Inexpensive, pay-as-you-go model with no up-front costs.
+			- Web-based AWS Management Console offers the simplicity of a point-and-click interface.
+		
+		SNS vs SQS
+			- Both Messaging Services with AWS
+			- SNS - Push
+			- SQS - Poll (Pulls)			
+		
+		Elastic Transcoder - Exam Tips
+			- Media Transcoder in the cloud.
+			- Convert Media files from their original source format in different formats that will play on smartphones, tables, PCS etc.
+			- Provides transcoding presets for popular output formats, which means that you don't need to guess about which settings work best on particular devices.
+			- Pay based on the minutes that you transcode and the resolution at which you transcode.
+		
+		API Gateway - Exam Tips (5 to 10 questions)
+			- API Gateway is at a fully managed service that makes it easy for developers to publish, maintain, monitor and secure APIs at any scale.
+			- API Gateway has caching capabilities to increase performance
+			- API Gateway is low cost and scales automatically
+			- You can throttle API Gateway to prevent attacks
+			- You can log results to CloudWatch
+			- If you are using Javascript/AJAX that uses multiple domains with API Gateway, ensure that you have enable CORS on API Gateway.
+			- CORS is enforced by the client (Browser)
+	
+		 Kinesis 101 (Streaming Data): 3 different types of Kinesis (Exam Tips)
+     
+			1. Kinesis Streams: Stores data in Shards. (Retention from 24 hours to 7 days). 
+
+
+- Used to ingest data in real time directly from source
+- Throughput
+
+    Publishing: 1MB/sec per shard or 1000 msg/sec per shard
+    Consuming:
+        2MB/sec per shard (throughput shared between all consumers)
+        Enhanced Fanout: 2MB/sec per shard per consumer (dedicated throughput for each consumer)
+
+- Throughput scales with shards (manual scaling)
+- Not Serverless
+- Billing per shard (provisioned)
+- A record consists of a partition key (used to partition data coming from multiple publishers) and data blob (max 1MB)
+- Records will be ordered in each shard
+- Producers use SDK, Kinesis Producer Library (KPL) or Kinesis Agent to publish records
+- Consumers use SDK or Kinesis Client Library (KCL) to consume the records
+- Once data is inserted in Kinesis, it can’t be modified or deleted (immutability)
+- Ability to reprocess (replay) data
+
+			2. Kinesis Firehose: Kinesis Firehose has no data persistence, however it processes the data using Lambda and stores it in S3, DynamoDB, RedShift, EMR, Amazon Elasticsearch 			   Service, and Splunk, enabling near real-time analytics with existing business intelligence tools and dashboards you’re already using today.
+		
+    - Used to load streaming data into a target location
+- Writes data in batches efficiently (near real time)
+ -  Can ingest data in real time directly from source
+- Greater the batch size, higher the write efficiency
+- Auto-scaling
+- serverless
+- Destinations:
+
+    AWS: Redshift, S3, ElasticSearch
+    3rd party: Splunk, MongoDB, DataDog, NewRelic, etc.
+    Custom: send to any HTTP endpoint
+
+- Pay for data going through Firehose (no provisioning)
+- Supports custom data transformation using Lambda functions
+- Max record size: 1MB
+- No replay capability
+
+			3. Kinesis Analytics: Works with Kinesis Streams and Kinesis Analytics to analyse the data on the fly.
+      
+    -  Perform real-time analytics on Kinesis streams using SQL
+    - Creates streams from SQL query response
+- Cannot ingest data directly from source (ingests data from KDS or KDF)
+- Auto-scaling
+- Serverless
+- Pay for the data processed (no provisioning)
+- Use cases:
+
+    Time-series analytics
+    Real-time dashboards
+    Real-time metrics
+
+
+			
+		 Refer to Web Identity Federation & Cognito (Exam Tips)
+		 	
+		 Event Processing Patterns - Exam Tips
+			- Understand the pub/sub pattern - facilitated by SNS
+			- DLQ - SNS, SQS, Lambda
+			- Fanout pattern - SNS
+			- S3 event notifications - Which events trigger; which services consume
