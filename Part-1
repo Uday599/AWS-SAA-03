@@ -1,0 +1,539 @@
+==========================================================================================================================================================================================
+* IAM 101 and S3
+==========================================================================================================================================================================================
+identity access management offers the following features.
+* Centralised control of your AWS account.
+* Shared access to your AWS account.
+* Granular permissions. So you can say, okay, I want people to be able to access this service, but I don't want people to be able to access that service.
+* Identity Federation (including Active Directory, Facebook, LinkedIn ... etc)
+* Multifactor authentication.
+* Provides temporary access for users or devices and services where necessary
+* Allows you to set up your own password rotation policy.
+* Integrates with many different AWS services
+* It supports PCI DSS compliance.
+* PCI DSS compliance just is basically a compliant framework that if you're taking credit card details, you need to be compliant with the framework. So IAM supports PCI DSS.
+
+https://docs.aws.amazon.com/IAM/latest/UserGuide/intro-structure.html
+
+Key Terminology for IAM: 
+1. Users: End users such as people, employees of an organisation ... etc
+2. Groups: A collection of users. So each user in the group will inherit the permissions of the group.
+3. Policies: policies are made up of documents, called policy documents. These documents are in a format called JSON and they give permission as to what a User/Group is able to do.
+4. Roles: You can create roles and assign them to AWS resources
+
+* Exam Tips:
+* IAM is universal (Global). It doesn't apply to regions at this time.
+* The "root account" is simply the account created when first setup your AWS account. It has complete Admin access.
+* New Users have NO permissions when first created.
+* New Users are assigned Access Key ID & Secret Access Keys when first created.
+* These are not the same as a password. You cannot use the Access key ID & Secret Access to login to the console. You can use this to access AWS via the APIs and Command Line, however.
+* You can get to view these once. If you lose them, you have to regenerate them. So, save them in a secure location.
+* Always setup Multifactor Authentication on your root account.
+* You can create and customise your own password rotation policies.
+
+* S3 Exam Tips:
+	1. Remember that S3 is Object-based: i.e allows you to upload files.
+	2. Files can be 0 Bytes to 5 TB.
+	3. There is unlimited storage.
+	4. Files are stored in Buckets.
+	5. S3 is a universal namespace. That is, names must be unique globally. Example: https://s3-eu-west-1.amazonaws.com/acloudguru
+	6. Not suitable to install operating systems on S3 due to it being object based (not block storage - EBS), can only be used to store files
+	7. Successful upload will generate a HTTP 200 status code.
+	8. You can turn on MFA delete to avoid accidental delete. 
+	9. The key fundamentals of S3 are:
+		- Key (This is simply the name of the object)
+		- Value (This is simply the data and is made up of a sequence of bytes).
+	10. S3 Model: 
+		- Read after Write consistency for PUTS of new objects (if you write a new files and read it immediately afterwards, you will be able to view the data)
+		- Eventual Consistency for overwrite PUTS and DELETES (can take sometime to propagate) (If you update AN EXISTING file or delete a file and read it immediately, you may get the older version, or you may not. Basically changes to objects can take a little bit of time to propagate.)
+	11. S3 Storage Classes
+		1. S3 Standard: 99.99% availability, 99.99999999999% durability stored redundantly across multiple devices in multiple facilities and is designed to sustain the loss of 2 facilities concurrently.
+		2. S3 - IA (Infrequently Accessed): 99.9% availability, For the data that is accessed less frequently, but requires rapid access when needed. Lower fee than S3, but you are charged a retrieval fee.
+		3. S3 - Intelligent Tiering: 99.9% availability, Designed to optimise costs by automatically moving data to the most cost-effective access tier, without performance impact or operational overhead.
+		4. S3 One Zone IA (also called S3 RRS): 99.5% availability, For where you want a lower-cost option for infrequently accessed data, but do not require the multiple availability zone data resilience.
+		5. S3 Glacier: S3 Glacier is a secure, durable and low-cost storage class for data archiving. You can reliably store any amount of data at costs that are competitive with or cheaper than on-premises solutions. Retrieval times are configurable from minutes to hours.
+		6. S3 Glacier Deep Archive: S3 Glacier Deep Archive is Amazon's lowest-cost storage class where a retrieval time of 12 hours is acceptable.
+		7. S3 Outposts for on-premises object storage to meet data residency needs.
+
+* S3 Bucket Exam Tips:
+	12. Bucket names share a common name space, you can't have the same bucket name as the others.
+	13. When you view Buckets you view them globally but you can have buckets in individual regions.
+	14. We can use cross region replication to replicate buckets automatically to different regions.
+	15. We can change storage class and encryption on the fly.
+	16. Transfer acceleration
+	17. Restricting Bucket Access:
+		1. Bucket Policies - Applies across the bucket.
+		2. Object Policies - Applies to individual files.
+		3. IAM Policies to Users & Groups - Applies to Users & Groups.
+	18. By default Buckets are not public.
+	19. You can use bucket policies to make entire S3 buckets public.
+	20. You can use S3 bucket to host static websites but can't host dynamic websites or websites which require database, for ex: Wordpress...etc.
+	21. Control access to buckets using either a bucket ACL or bucket policies.
+	22. When we change from Allow to Deny on a policy OR create a policy with DENY, it's called an explicit DENY and it would always overwrite the allow in any other policy.
+	23. By default, all permissions are implicitly denied.
+
+
+* Important: Read S3 FAQ's: https://aws.amazon.com/s3/faqs/
+
+* S3 Pricing Tier: What drives the price?
+	What makes up the cost?
+		1. Storage
+		2. Requests and Data Retrievals
+		3. Data Transfer
+		4. Management and Replication
+
+* S3 Pricing (Very Important) Exam Tips:
+	Understand how to get the best value out of s3
+		1. S3 Standard - Avoid S3 Standard, use S3 - Intelligent Tiering
+		2. S3 IA
+		3. S3 - Intelligent Tiering
+		4. S3 One Zone - IA (No redundancy, if the zone fails, we loose the data)
+		5. S3 Glacier - For Archival services 
+		6. S3 Glacier Deep Archive - For Archival services 
+
+* S3 Security & Encryption:
+	1. By default, all newly created buckets are PRIVATE, you can setup access control to your buckets using;
+		a. Bucket Policies
+		b. ACL'S
+	2. S3 buckets can be configured to create access logs which log all requests made to the S3 bucket.
+	   This can be sent to another bucket or even another bucket in another account.
+
+*  S3 Encryption (Very important - will be tested on this in the exam)
+	1. Encryption In Transit is achieved by 
+		a. SSL/TLS (HTTPS)
+	2. Encryption at Rest (Server Side) is achieved by
+		a. Serve-Side 
+			1. S3 Managed Keys - SSE - S3
+			2. AWS Key Management Service, Managed Keys - SSE-KMS
+			3. Serve-Side Encryption with Customer Provided Keys - SSE-C
+		b. Client-Side Encryption	
+			4.  Done by the client
+	Lab: We can encrypt the files in S3 by using AES-256 or AWS-KMS.
+	     Note: AWS-KMS is beyond the scope of this exam
+
+*  S3 Encryption Demo
+	1. Stores all versions of an object (including all writes and even if you delete an object)
+	2. Great backup tool.
+	3. Once enabled, Versioning cannot be disabled, only be suspended. You have to delete the bucket and create a new one.
+	4. Integrates with Lifecycle rules.
+	5. Versioning's MFA Delete capability, which uses multi-factor authentication, can be used to provide an additional layer of security.
+
+*  S3 Versioning Lab
+Imp: 
+	1. With versioning enabled, when we upload a newer version of the file - the newer file's permission need to be made public. Older versions permissions remain the same.
+	2. From Architecture perspective - based on the requirements, versioning need to be enabled as the size of S3 bucket will increase exponentially.
+	Or make a decision to enable lifecycle policy to retire old versions quickly.
+	
+*  S3 Versioning Exam Tips:
+	1. Stores all versions of an object (including all writes and even if you delete an object)
+	2. Great backup tool.
+	3. Once enabled, Versioning cannot be disabled, only suspended
+	4. Integrates with Lifecycle rules.
+	5. Versioning's MFA Delete capability, which uses multi-factor authentication, can be used to provide an additional layer of security.
+	 
+*  S3 LifeCycle Management Lab
+	Note: 
+	1. Transitioning small objects to Glacier or Glacier Deep Archive will increase costs
+	Before creating a lifecycle rule that transitions small objects to Glacier or Glacier Deep Archive, consider how many objects will be transitioned and how long you plan to keep the objects. Lifecycle request charges for these objects will increase your costs.
+	
+	2. Expire current versions of objects: Min days must be greater than 60
+
+*  S3 LifeCycle Management - Exam Tips
+	1. Automates moving your objects between the different storage tiers.
+	2. Can be used in conjunction with versioning.
+	3. Can be applied to current and previous versions.
+
+*  S3 Object Lock and Glacier Vault Lock
+	1. S3 Object Lock: Store objects using a write-once-read-many (WORM) model to help you prevent objects from being deleted or overwritten for a fixed amount of time or indefinitely.
+	2. You can use S3 Object lock to meet regulatory requirements that require WORM storage, or add an extra layer of protection against object changes and deletion.
+	3. To enable object lock, it must be first enabled at the bucket level. Amazon S3 currently does not support enabling object lock after a bucket has been created. To enable object lock for this bucket, contact customer support.
+	4. Comes in different modes:
+		a. Governance Mode: Users can't overwrite or delete an object version or alter its lock settings unless they have special permissions.
+		With governance mode, you protect objects against being deleted by most users, but you can still grant some user permissions to alter the retention settings or delete the object if unnecessary.
+		b. Compliance Mode: A protected object version can't be overwritten or deleted by any user, including the root user in your AWS account. When an object is locked in compliance mode, its retention mode can't be changed and its retention period can't be shortened. Compliance mode ensures an object version can't be overwritten or deleted for the duration of the retention period.
+	5. Retention Period: A retention period protects an object version for a fixed amount of time. When you place a retention period on an object version, Amazon S3 stores a timestamp in the object version's metadata to indicate when the retention period expires. After the retention period expired, the object version can be overwritten or deleted unless you also placed a legal hold on the object version.
+	6. Legal Hold: S3 Object lock also enables you to okay a legal hold on an object version. Like a retention period, a legal prevents object version from being overwritten or deleted. However, a legal hold doesn't have an associated retention period and remains in effect until removed. Legal holds can be freely placed and removed by any user who has the s3:PutObjectLegalHold permission.
+	
+* Glacier Vault Lock: It allows you to easily deploy and enforce compliance controls for individual S3 Glacier vaults with a Vault Lock policy. You can specify controls, such as WORM, in a Vault Lock policy from future edits. Once locked, the policy can no longer be changed.
+
+*  S3 Object Lock and Glacier Vault Lock - Exam Tips
+	1. Use S3 Object lock to store objects using a write once, read many (WORM) model.
+	2. Object locks can be on individual objects or applied across the bucket as a whole.
+	3. Object locks come in two models: Governance mode and Compliance mode.
+	4. With governance mode, Users can't overwrite or delete an object version or alter its lock settings unless they have special permissions.
+	5. With Compliance Mode: A protected object version can't be overwritten or deleted by any user, including the root user in your AWS account.
+	6. S3 Glacier Vault Lock allows you to easily deploy and enforce compliance controls for individual S3 Glacier vaults with a Vault Lock policy. You can specify controls, such as WORM, in a Vault Lock policy from future edits. Once locked, the policy can no longer be changed.
+
+*  S3 Performance
+	1. S3 Prefix: 
+		mybucketname/folder1/subfolder1/myfile.jpg 	> 	/folder1/subfolder1 is the prefix
+		mybucketname/folder2/subfolder1/myfile.jpg 	> 	/folder2/subfolder1 is the prefix
+		mybucketname/folder3/myfile.jpg 	   				> 	/folder3 is the prefix
+		mybucketname/folder4/subfolder4/myfile.jpg 	> 	/folder4/subfolder4 is the prefix
+	
+		Why is prefix important?
+		1. S3 is all about performance, S3 has extremely low latency. You can get the first byte out of S3 within 100-200 milliseconds
+		You can also achieve a high number of requests: 3,500 PUT/COPY/POST/DELETE and 5,500 GET/HEAD requests per second per prefix
+	
+		2. You can get better performance by spreading your reads across different prefixes. For Example, If you are using two prefixes, you can achieve 11,000 requests per second.
+		3. If we used all four prefixes in the last example, you would achieve 22,000 requests per second.  
+
+	2. S3 Limitations when using KMS
+		1. If you are using SSE-KMS to encrypt your objects in S3, you must keep in mind the KMS limits.
+		2. When you upload a file, you will call GenerateDataKey in the KMS API.
+		3. When you download a file, you will call Decrypt in the KMS API.
+		4. Uploading/Downloading will count towards the KMS quota.
+		5. Region-specific, however, it's either 5,500, 10,000 or 30,000 requests our second.
+		6. Currently, you cannot request a quota increase for KMS.
+	
+	3. S3 Performance Uploads
+		Multipart Uploads:
+			1. Recommended for files over 100MB
+			2. Required for files over 5GB
+			3. Parallelise uploads (increase efficiency)
+		
+	4. S3 Performance Downloads:
+		S3 Byte-Range Downloads:
+			1. Parallelise downloads by specifying byte ranges.
+			2. If there's a failure in the download, it's only for a specific byte range.
+
+		S3 Byte-Range Fetches:
+			1. Can be used to speed up downloads
+			2. Can be used to just download partial amounts of the file (eg., header information)
+			
+*  S3 Performance - Exam Tips:
+	1. mybucketname/folder1/subfolder1/myfile.jpg > 	/folder1/subfolder1 is the prefix
+	2. You can also achieve a high number of requests: 3,500 PUT/COPY/POST/DELETE and 5,500 GET/HEAD requests per second per prefix
+	3. You can get better performance by spreading your reads across different prefixes. For Example, If you are using two prefixes, you can achieve 11,000 requests per second.
+	4. If you are using SSE-KMS to encrypt your objects in S3, you must keep in mind the KMS limits.
+		a. Uploading/Downloading will count towards the KMS quota.
+		b. Region-specific, however, it's either 5,500, 10,000 or 30,000 requests our second.
+		c. Currently, you cannot request a quota increase for KMS.		
+	5. Use multipart uploads to increase performance when uploading files to S3.
+	6. Should be used for any files over 100MB and must be used for any file over 5GB.
+	7. Use S3 byte-range fetches to increase performance when downloading files to S3.
+	
+*  S3 Select and Glacier Select:
+	S3 Select: S3 Select enables applications to retrieve only a subset of data from an object by using simple SQL expressions. 
+	By using S3 Select to retrieve only the data needed by your application, you can achieve drastic performance increases - in many cases, you can get as much as 400% improvement (up to 80% cheaper)
+	
+	Glacier Select: Some companies in highly regulated industries - e.g., financial services, healthcare, and others - write data directly to Amazon Glacier to satisfy compliance needs like SEC Rule 17a-4 or HIPAA. Many S3 users have lifecycle policies designed to save on storage costs by moving their data into Glacier when they no longer need to access to on a regular basis.
+	Glacier Select allows you to run SQL queries against Glacier directly.
+
+*  S3 Select and Glacier Select - Exam Tips
+	1. Remember that S3 Select is used to retrieve only a subset of data from an object by using simple SQL expressions.
+	2. Get data by rows or columns using simple SQL expressions.
+	3. Save money on data transfer and increase speed.
+
+* AWS organisations & Consolidated Billing
+	1. AWS organisations is an account management service that enables you to consolidate multiple AWS accounts into an organisation that you create and centrally manage.
+	2. We can have a group within a group and a user can belong to more than one group as they inherit from the super groups.
+	3. Policy will trickle down to all the other accounts and OU's underneath it.
+	4. Can do consolidated billing: more that you use, the less that you pay.
+	5. Paying accounts is independent. Cannot access resources of the other accounts.
+	6. All linked accounts are independent.
+	
+	Advantages of Consolidated Billing:
+	1. One bill per AWS account.
+	2. Very easy to track charges and allocate costs.
+	3. Volume pricing discount.
+
+* AWS organisations & Consolidated Billing - Exam Tips
+	1. Always enable multi-factor authentication on root account.
+	2. Always use a strong and complex password on root account.
+	3. Paying account should be used for billing purposes only. Do no deploy resources into the paying account.
+	4. Enable/Disable AWS services using Service Control Policies (SCP) either on OU or on individual accounts.
+	
+* Lab - Sharing S3 buckets across accounts - Exam Tips:
+	3 different ways to share S3 buckets across accounts
+		1. Using Bucket policies & IAM (applies across the entire bucket). Programmatic access only.
+		2. Using Bucket ACLs & IAM (individual objects).  Programmatic access only.
+		3. Cross-account IAM Roles. Programmatic and Console access.
+
+* Lab - AWS Cross-Region Replication - Demo and Exam Tips
+	1. Versioning must be enabled on both the source and destination buckets.
+	2. Files in an existing bucket are not replicated automatically.
+	3. Delete markers are not replicated.
+	4. Deleting individual versions or delete markets will not be replicated.
+	5. Understand what Cross Region Replication is at a high level
+
+* S3 Transfer Acceleration
+	S3 Transfer Acceleration utilised the CLoudFront Edge Network to accelerate your uploads to S3. Instead of uploading to your S3 bucket, you can use a distinct URL to upload directly to an edge location which will then transfer that file to S3. You will get a distinct URL to upload to sri-s3-accelarate.amazonaws.com
+
+* AWS DataSync: Exam Tips
+	1. Used to move large amounts of data from on-premises to AWS.
+	2. Used with NFS and SMB compatible file systems (On premise).
+	3. Replication can be done hourly, daily or weekly.
+	4. Install the DataSync agent to start the replication.
+	5. Can be used to replicate EFS to EFS.
+	6. AWS DataSync securely connects to Amazon S3, Amazon EFS or Amazon Fsx (Windows File Server)  to copy data and metadata to and from AWS.
+
+* CloudFront
+
+	CloudFront is a content delivery network (CDN) is a system of distributed servers (network) that deliver webpages and other web content to a user based on the geographic locations of the user, the origin of the webpage and a content delivery server.
+
+  CloudFront - Key Terminology:
+	1. Edge location: This is the location where content will be cached. This is separate to an AWS Region/AZ.
+	2. Origin - This is the origin of all the files that the CDN will distribute. This can be an S3 Bucket, an EC2 Instance, an Elastic Load Balancer or Route 53.
+	3. Distribution - This is the name given the CDN which consists of a collection of Edge locations.
+
+  Amazon CloudFront can be used to deliver your entire website, including dynamic, static, streaming and interactive content using a global network of edge locations.
+  Requests for your content are automatically routed to the nearest edge location, so content is delivered with the best possible performance.	
+
+  When the first user queries for a file, it gets downloaded from the server. The second user gets a cached copy from the Edge Location instead of downloading it again from the server. The file has Time     to live defined usually 48 hours.	
+
+	2 types of distribution:
+	Web Distribution - Typically used for Websites
+	RTMP - Used for Media Streaming
+
+ * CloudFront Exam Tips
+	1. Edge location: This is the location where content will be cached. This is separate to an AWS Region/AZ.
+	2. Origin - This is the origin of all the files that the CDN will distribute. This can be an S3 Bucket, an EC2 Instance, an Elastic Load Balancer or Route 53.
+	3. Distribution - This is the name given the CDN which consists of a collection of Edge locations.
+
+	2 types of distribution:
+	Web Distribution - Typically used for Websites
+	RTMP - Used for Media Streaming
+
+	Note: 
+	1. Edge Locations are not just READ only - you can write them too. (ie Put an object on to them).
+	2. Objects are cached for the life of TTL (Time to live)
+	3. You can clear cached objects, but you will be charged.
+	4. We can restrict access using signed URL's (Example: Netflix - Option in AWS CloudFront is "Restrict Viewer access (Use Signed URL's or Signed cookies)") 
+
+* Create a CloudFront Distribution - Demo
+	1. Exam Tip: We use Create invalidation to invalidate an object in CloudFront. Example: We pushed out some data but it is not showing up correctly, in order to deal with this we use Invalidations.
+	2. We need to disable before we delete a CloudFront distribution.
+	
+* CloudFront Signed URLs and Cookies vs S3 Signed URL
+   CloudFront Signed URL:
+	1. A signed URL is for individual files, 1 files = 1 URL.
+	2. A signed cookie is for multiple file, 1 cookie = multiple files.
+	3. When we create a signed URL or signed cookie, we attach a policy.
+	   The policy can include:
+		a. URL expiration.
+		b. IP ranges
+		c. Trusted Signers (which AWS accounts can create signed URL's)
+	4. Can have different origins. Does not have to be EC2.
+	5. Key-pair is account wide and managed by the root user.
+	6. Can utilise caching features.
+	7. Can filter by date, path, IP address, expiration, etc.
+	
+    S3 Signed URL:
+	1. Issues a request as the IAM user who creates the pre-signed URL.
+	2. Limited lifetime.
+	
+    Exam Tips:
+	1. Use signed URLs/cookies when you want to secure content so that only the people you authorise are able to access it.
+	2. A signed URL is for individual files, 1 files = 1 URL.
+	3. A signed cookie is for multiple file, 1 cookie = multiple files.
+	4. If your origin is EC2, then use CloudFront.
+	5. If your origin is S3, then use S3 signed URL instead of CloudFront Signed URL.
+
+* Snowball
+	What is Snowball?
+		1. AWS Snowball is a PB-Scale data transport solution that uses secure appliances to transfer large amounts of data in and out of the AWS cloud. Think of it as a gigantic disk to move your data into AWS. Using Snowball addresses common challenges with large-scale data transfers including high network costs, long transfer times, and security concerns.
+Transferring data with snowball is simple, fast. Secure and can be as little as one-fifth the cost of high-speed internet. 
+
+		2. AWS Snowball Edge is a 100TB data transfer device with on-board storage and compute capabilities. You can use Snowball Edge to move large amounts of data into and out of AWS, as a temporary storage tier for large local datasets, or to support local workloads in remote or offline locations.
+
+		3. AWS Snowmobile is an Exabyte-scale data transfer service used to move extremely large amounts of data to AWS. You can transfer up to 100PB per Snowmobile, a 45-foot long ruggedised shipping container, pulled by a semi-trailer truck. Snowmobile makes it easy to move massive volumes of data to the cloud, including video libraries, image repositories, or even a complete data centre migration. Transferring data with Snowmobile is secure, fast and cost effective.
+
+	- What determines price for Snowball?
+		1. Service fee per job
+			- Snowball 50 TB: $200
+			- Snowball 80 TB: $250
+
+		2. Snowball uses multiple layers of security designed to protect your data including tamper-resistant enclosures, 256-bit encryption, and an industry-standard Trusted Platform Module (TPM) designed to ensure both security and full chain-of-custody of your data. Once the data transfer job has been processed and verified, AWS performs a software erasure of the Snowball appliance. 
+
+		3. Daily Charge
+			- First 10 days are free, after that it's $15 a day.
+
+		4. Data transfer
+			- Data transfer in to S3 is free. Data transfer out is not.
+
+		5. Snowball can Import to S3 and Export from S3.
+
+	- When should I use Snowball
+		Available Internet Connection 			Theoretical Min. No of days to transfer 100TB at 80% n/w utilisation When to Consider AWS Import/Export Snowball?
+		T3 (44.736 Mbps)		269 days									2TB or more
+		100 Mbps						120 days									5TB or more
+		1000 Mbps						12 days										60TB or more
+
+* Storage Gateway
+	1. AWS Storage Gateway is a service that connects an on-premises software appliance with cloud-based storage to provide seamless and secure integration between an organisation's on-premise IT environment and AWS's storage infrastructure. The service enables you to securely store data to the AWS cloud for scalable and cost effective storage.
+	
+	2. AWS Storage Gateway's software appliance is available for download as a VM image that you install on a host in your datacenter. StorageGateway supports either VMWare ESXi or Microsoft Hyper-V. Once you've installed your gateway and associated it with your AWS account through the activation process, you can use the AWS management console to create the storage gateway option that is right for you.
+	
+	3. Three different types of Storage gateway:
+		a. File Gateway (NFS & SMB): Files are stored as objects in your S3 buckets, accessed through a Network File System (NFS) mount point. Ownership, permissions and timestamps are durably stored in S3 in the user-metadata of the object associated with the file. Once objects are transferred to S3, they can be managed as native S3 objects, and bucket policies such as versioning, lifecycle management and cross-region replication apply directly to objects stored in your bucket.
+
+		b. Volume Gateway (iSCSI)
+			1. Stored Volumes: 
+				- The volume interface presents your applications with disk volumes using the iSCSI block protocol.
+				- Data written to these volumes can be asynchronously backed up as point-in-time snapshots of your volumes, and stored in the cloud as Amazon EBS snapshots.
+				- Snapshots are incremental backups that capture only changed blocks. All snapshot storage is also compressed to minimise your storage charges.
+				- Stored Volumes let you store your primary data locally, while asynchronously backing up the data to AWS. Stored volumes provide your on-premises applications with low-latency access to their entire datasets, while providing durable, off-site backups. You can create storage volumes and mount them as iSCSI devices from your on-premises application servers.
+Data written to your stored volumes in stored on your on-premises storage hardware. This data is asynchronously backed up to Amazon Simple Storage Service (Amazon S3) in the form of Amazon Elastic Block Store (Amazon EBS) snapshots. 1 GB - 16 TB in size for Stored Volumes.			
+
+			2. Cached Volumes: Cached Volumes let you use Amazon Simple Storage Service (Amazon S3) as your primary data storage while retaining frequently accessed data locally in your storage. Cached volumes minimise the need to scale your on-premises storage infrastructure, while still providing your applications with low-latency access to their frequently accessed data, 
+You can create storage volumes up to 32TB in size and attach to them as iSCSI devices from your on-premises application servers. Your gateway stores data that you write to these volumes in Amazon S3 and retains recently read data in your on-premises storage gateways cache and upload buffer storage. 1GB - 32TB in size for Cached Volumes.
+
+		c. Tape Gateway (VTL): Tape Gateway offers a durable, cost-effective solution to archive your data in the AWS Cloud. The VTL interface it provides lets you leverage your existing tape-based backup application infrastructure to store data on virtual tape cartridges that you create on your tape gateway, Each tape gateway is preconfigured with a media changer and tape drives, which are available to your existing client backup applications as iSCSI devices. You add tape cartridges as you need to archive your data. Supported by NetBackup, Backup Exec, Veeam etc.
+
+Exam Tips:
+	1. Three different types of Storage gateway:
+		a. File Gateway (NFS & SMB): For flat files, stored directly on S3
+
+		b. Volume Gateway (iSCSI)
+			1. Stored Volumes: Entire Dataset is stored on site and is asynchronously backed up to S3. 
+
+			2. Cached Volumes: Entire Dataset is stored on S3 and the most frequently accessed data is cached on site.
+
+		c. Tape Gateway (VTL)
+
+* Athena Vs Macie (Exam Tips)
+	- What is Athena?
+		- Interactive query service which enables you to analyse and query data located in S3 using standard SQL
+		- Serverless, nothing to provision, pay per query / per TB scanned
+		- No need to set up complex Extract/Transform/Load (ETL) process
+		- Works directly with data stored in S3
+	- Athena can be used for
+		1. Can be used to query log files stores in S3. Ex: ELB Logs, S3 access logs ... etc
+		2. Generate business reports on data stored in S3.
+		3. Analyse AWS cost and usage reports
+		4. Run queries on click-stream data.
+
+	- What is Macie?
+		- Security service which uses machine learning and NLP (natural language processing) to discover, classify and protect sensitive data stored in S3
+		- Uses AI to recognise if your S3 objects contain sensitive data such as personal identification information (PII).
+		- Dashboards, reporting and alerts
+		- Works directly with data stored in S3
+		- Can also analyse CloudTrail logs
+		- Great for PCI-DSS and preventing ID theft.
+
+** IAM Summary
+	- IAM is universal, it does not apply to regions at this time.
+	- The root account is simply the account that's created when you first set up your AWS account and it has complete administrator access.
+	- New users have no permissions when first created and you'll find this is a theme within Amazon. It's called least privilege.
+	- So, whenever you create a new user, that user's not going to have any rights or any privileges until you grant them privileges. Likewise when we look at S3, when we create our bucket,
+it's locked down, it's not public and making objects public is not that easy. You have to go through a process to do it. So, that's a common theme within Amazon Web Services.
+	- New users are assigned an access key ID and secret access key when first created.
+	- These are not the same as a password.	You cannot use the access key ID and secret access key to log into the console.
+	  You use it to access AWS via the APIs and the Command Lines, however.
+	- You only get to view your access key ID and secret access key once. If you lose them you have to regenerate them. So, make sure you save them in a secure location.
+	- Always setup multi-factor authentication on your root account and you can also create and customize your own password rotation policies.
+
+** S3 Summary
+	- S3 is object based. i.e. allows you to upload files.
+	- Files can be zero bytes all the way up to 5 terabytes
+	- There is unlimited storage
+	- Files are stored in buckets
+	- S3 is a universal namespace. That is, bucket names must be unique.
+	- https://s3-eu-west-1.amazonaws.com/acloudguru
+	- Not suitable to install an operating system on or a database or anything like that.
+	- Successful uploads will generate HTTP 200 status code.
+	- By default all newly created buckets are PRIVATE.
+	- You set up access control to your bucket using 
+		a. Bucket policies and bucket policies are bucket wide 
+		b. Access control lists and these can go down to the individual files or objects in your bucket.
+	- S3 buckets can be configured to create access logs which logs all requests made to the S3 bucket
+	  and these can be sent to another bucket in the same AWS account or even another bucket in another AWS account.
+	- The key fundamentals of S3 are:
+		a. key (This is simply the name of the object.)
+		b. value (This is simply the data is made up a sequence of bytes). so some sometimes people refer to S3 as a key value pair.
+		c. Version ID (Important for versioning)
+		d. Metadata (Data about data you are storing) and we do that through tags and then you get some sub resources such as access control lists and then torrents as well
+
+	- Read after write consistency of puts of new objects
+	- Eventual consistency for overwrite puts and deletes and this can take some time to propagate.
+	- Exam Tips:
+		1. S3 Standard: 99.99% availability, 99.99999999999% durability, stored redundantly across multiple devices, and is designed to sustain the loss of 2 facilities
+		2. S3 - IA (Infrequently accessed): For data that is accessed less frequently, but requires rapid access when needed. Lower fee than S3, but you are charged a retrieval fee.
+		3. S3 One Zone IA: For where you want a lower cost option for infrequently accessed data, but do not require the multiple availability zone.
+		4. S3 Intelligent Tiering: Designed to optimise costs by automatically moving data to the most cost-effective access tier, without performance impact or operational overhead.
+		5. S3 Glacier: S3 Glacier is a secure, durable and a low-cost storage class for data archiving. Retrieval times configurable from mins to hours.
+		6. S3 Glacier Deep Archive: S3 Glacier Deep Archive is Amazon S3's lowest-cost storage class where a retrieval time of 12 hours is acceptable.
+		7. You can use bucket policies to make entire S3 buckets public.
+		8. You can use S3 to host STATIC websites (such as .html). Websites that require database connections such as Wordpress etc cannot be hosted on S3.
+		9. S3 Scales automatically to meet your demand. Many enterprises will put static websites on S3 when they think there is going to be a large number of requests (such as for a movie preview for example)
+
+	- Understand how to get the best value out of S3
+		1. S3 Standard (Availability: 99.99%)
+		2. S3 - IA (Availability: 99.9%)
+		3. S3 - Intelligent Tiering (Availability: 99.9%)
+		4. S3 One Zone - IA (Don't use this if the data is crucial) (Availability: 99.5%)
+		5. S3 Glacier - Data Archival (Availability: 99.99%)
+		6. S3 Glacier Deep Archive (Availability: 99.99%)
+
+	- Encryption in transit is achieved by using SSL/TLS.
+	- S3 also has encryption at rest (Server Side) is achieved by three different ways.
+		1. S3 managed keys - SSE-S3: This is where S3 just handle all our encryption for us and we don't have to worry about them.
+		2. AWS key management service or KMS: This is where we can start using keys from the KMS service.
+		3. Server side encryption with customer provided keys - SSE-C: This is where you provide your keys and you manage the encryption and the actual you know maintenance of those keys.
+		4. Client-side encryption: This is where you encrypt the objects and then you upload them to S3.
+
+	- AWS Organizations: Some best practices with AWS Organizations.
+		1. Always enable multi-factor authentication on root or master account.
+		2. Always use strong and complex passwords on root account.
+		3. Paying account should be used for billing purposes only. Do not deploy resources into the paying account, into the root account or the master account,
+		4. Enable and disable AWS services using service control policies (SCPs) either on organisational units or on individual accounts.
+
+	- three different ways to share S3 buckets across accounts.
+		1. Using bucket policies and IAM (applies across the entire bucket). Programmatic access only.
+		2. Using bucket ACLs and IAM (individual objects). Programmatic access only.
+		3. Cross account IAM Roles, Programmatic and Console access
+
+	- Cross Region Replication
+		1. Versioning to be enabled on both the source and the destination buckets.
+		2. Files in an existing bucket are not replicated automatically.
+		3. All subsequent updated files will be replicated automatically.
+		4. Delete markers are not replicated
+		5. Deleting individual versions or delete markers will also not be replicated.
+		6. Understand what cross region replication is at a high level.
+
+	- Lifecycle policies
+		1. Automates moving your objects between the different storage tiers.
+		2. Used in conjunction with versioning.
+		3. Can be applied to current versions as well as previous versions.
+
+	- S3 Transfer Accelerations.
+		So, we have our users, they're all around the world. We have our edge locations. Our users will upload their files to the edge locations first and then those files will go over the AWS backbone network to S3. And we saw how mostly it can improve speed and performance. So, if you do need to increase the performance of your, you know, of your users being able to upload files to S3, look at S3 Transfer Acceleration.
+
+	- CloudFront.
+		1. Edge location - This is the location where the content is going to be cached and it's separate to an AWS region or availability zone.
+		2. Origin - This is the origin of all our files that the CDN will distribute and this can either be an S3 bucket, an EC2 instance, an elastic load balancer or Route 53.
+		3. Distribution - This is simply the name given to the CDN which consists of a collection of edge locations. 
+		4. We have two different types of distributions.
+			a. Web distributions - This is typically used for websites
+			b. RTMP - this is used for Adobe media and it's used for media streaming.
+		5. Edge locations are not read-only, you can write to them as well, i.e. put an object to them.	
+		6. Objects are cached for the time to live or TTL (Time To Live) and that value is always in seconds
+		7. You can clear cache objects by invalidating them but you will be charged.
+
+	- Snowball: Understand what Snowball is
+		1. It's a big disk that you can use to move your data in and out of the AWS cloud.
+		2. Snowball can be imported into S3. So, you can import data into S3. 
+		3. You can also use Snowball to move large amounts of data out of S3.
+
+	- Storage Gateway.
+		1. File Gateway - This is used for flat files that are stored directly on S3 and that's NFS.
+		2. Volume gateway - That's iSCSI and we have two different types of volume gateways.
+			a. Stored Volumes - Entire dataset is stored on site so it's literally a 100% copy (asynchronously) of your data being stored on-site and then it's backed up to S3.
+			b. Cached Volume - This is where the entire data set is stored on S3 and only the most frequently accessed data is cached on site.
+
+		3. Gateway virtual tape library - This is used for backups and works with really popular backup applications like NetBackup, Backup Exec, Veeam ... etc.
+
+	- Athena (This is a very popular exam topic.)
+		1. Athena is an interactive query service.
+		2. It allows you to query data located in S3 using standard SQL.
+		3. It's serverless 
+		4. Commonly used to analyse log data stored in S3 
+
+	- Macie 
+		1. Macie uses AI to analyse data in S3 and helps to identify personally identifiable information or PII.
+		2. It can also be used to analyse CloudTrail logs for suspicious API activity.
+		3. It includes dashboards, reports and alerting 
+		4. it's great for PCI-DSS compliance as well as preventing ID theft.
+
+*** Read the S3 FAQ before going into your exam because S3 is going to come up an awful lot in the Solutions Architect Associate Exam.
