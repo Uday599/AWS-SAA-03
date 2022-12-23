@@ -1,0 +1,166 @@
+=========================
+Security:
+# KMS
+# CLoudHSM - FIPS-140
+# System Manager - free - to store secrets
+# Secret manager - paid
+# AWS Shield- DDOS
+# WAF
+# AWS firewall manager
+============================
+
+** Reducing Security Threats
+		- NACL - IP or range of IP's, hard to maintain. so use WAF
+		- Security Groups at the instance level 
+		- AWS WAF - SQL Injection or cross site scripting
+		- You can attach WAF to CloudFront or NACL
+
+	** Key Management Service (KMS)
+	  - Regional secure key management and encryption and decryption
+		- Manages customer master keys (CMKs)
+		- Ideal for S3 objects, database passwords and API keys stored in.
+		- Encrypt and decrypt data up to 4KB in size
+		- Integrated with most AWS services.
+		- Pay per API call
+		- Audit capability using CloudTrail - logs delivered to S3.
+		- FIPS 140-2 Level 2
+		- Level 3 is CloudHSM
+		- Types of CMK's
+			- AWS Managed CMK: Free; used by default if you pick encryption in most AWS services. Only that service can use them directly. Dedicated to my account.
+			- AWS Owned CMK: Used by AWS on a shared basis across many accounts; you typically won't see these. Not dedicated to my account.
+			- Customer Managed CMK: Allows key rotation; controlled via key policies and can be enabled/disabled. Dedicated to my account.
+		
+		Symmetric vs Asymmetric CMKs
+			Symmetric:
+				- Default, same key used for encryption and decryption
+				- AES-256
+				- Never leave AWS unencrypted
+				- Must call the KMS API to use
+				- AWS services integrated with KMS use symmetric CMKs
+				- Encrypt, decrypt and re-encrypt data
+				- Generate data keys, data key pairs and random byte strings
+				- Import your own key material.
+	
+			Asymmetric:
+				- Mathematically related public/private key pair, used by SSL's
+				- RSA and elliptic-curve cryptography (ECC)
+				- Private key never leaves AWS encrypted
+				- Must call the KMIs API to use private key
+				- Download the public key and use outside AWS
+				- Used outside AWS by users who can't call KMS APIs
+				- AWS services integrated with KMS do not support asymmetric CMKs
+				- Sign messages and verify signatures
+		
+	** CloudHSM
+		- Dedicated hardware security module (HSM)
+		- FIPS 140-2 level 3 (Exam Scenario: if you see FIPS 140-2 level 3 - answer is CloudHSM)
+		- Level 2 is KMS (need to show evidence of tampering)
+		- Difference between KMS and CloudHSM - We manage our keys
+		- Difference between KMS (Multi Tenant) and CloudHSM (Single Tenant, dedicate h/w, Mutli-AZ cluster)
+		- Runs within a VPC in your account
+		- Industry-standard APIs - no AWS APIs
+		- PKCS#11
+		- Java Cryptography Extensions (JCE)
+		- Microsoft CryptoNG (CNG)
+		- Keep your keys safe - irretrievable if lost!
+		- CloudHSM will operate inside its own VPC dedicated to CloudHSM
+		- CloudHSM will project to ENI of customer VPC
+		- CloudHSM is not highly available by default, so we need to provision one HSM per subnet
+	
+	  Exam Tips:
+	  - Regulatory compliance requirements
+		- FIPS 140-2 level 3 (Exam Scenario: if you see FIPS 140-2 level 3 - answer is CloudHSM) 
+		
+	** System Manager Parameters Store
+		- Component of AWS Systems Manager (SSM)
+		- Secure serverless storage of configuration and secrets
+			- Passwords
+			- Database Connection Strings
+			- License Codes
+			- API Keys
+		- Values can be encrypted (KMS) or plain text	
+		- Separate data from source control
+		- Store parameters in hierarchies (Up to 15 levels deep)
+		- Track versions
+		- Set TTL to expire values such as passwords
+	
+	** Secrets Manager (Exam Tips: System Manager Parameters Store vs Secrets Manager)
+		- Similar to System Manager Parameters Store
+		- Charge per secret and per 10,000 API calls, so this might add up for large organisations, where as System Manager Parameters Store is free
+		- Automatically rotate secrets
+		- Apply the new key/passwords in RDS for you
+		- Generate random secrets
+		
+	** AWS Shield
+		- Protects against distributed denial-of-service (DDoS) attacks
+		
+		AWS Shield Standard vs AWS Shield Advanced
+		
+		AWS Shield Standard:
+			- Automatically enabled for all customers at no cost
+			- Protects against common layer 3 and 4 attacks
+				- SYN/UDP floods, SYN is TCP and UDP is UDP
+				- Reflection attacks
+			- Stopped a 2.3 Tbps DDOS attack for three days in Feb 2020
+
+		AWS Shield Advanced
+			- $3K per month per org
+			- Enhanced protection for EC2, ELB, CloudFront, Global Accelerator, Route 53
+			- Business and Enterprise support customers get 24 X 7 access to the DDoS Response Team (DRT)
+			- DDoS cost protection (similar to insurance)
+	
+	** Web Application Firewall	
+			- WAF that lets you monitor HTTP(S) requests to CloudFront, ALB or API Gateway
+			- Control access to content
+			- Configure filtering rules to allow/deny traffic:
+				- IP addresses
+				- Query string parameters
+			- SQL query injection
+			- Blocked traffic returns HTTP 403 Forbidden code.	
+
+			- WAF allows three different behaviours;
+				- Allow all requests, except the ones you specify
+				- Block all requests, except the ones you specify
+				- Count the requests that match the properties you specify	
+
+			- Request Properties				
+				- Originating IP address
+				- Originating country
+				- Request Size
+				- Values in request headers
+				- Strings in request matching regex patterns.
+				- SQL Code injection
+				- Cross-site scripting (XSS)
+		
+			- AWS Firewall Manager
+				- Centrally configure and manage firewall rules across an AWS Organisation
+					- WAF Rules
+						- ALB
+						- API Gateway
+						- CloudFront distributions
+
+					- AWS Shield Advanced protections:
+						- ALB
+						- ELB Classic
+						- EIP
+						- CloudFront distributions
+					
+					- Enable security groups for EC2 and ENIs	
+				
+	** AWS WAF & AWS Shield (Exam Tips)
+			- What us AWS WAF? To prevent Cross scripting or SQL injection
+				1. AWS WAF is a web application firewall that helps protect your web application from common web exploits that could affect application availability, compromise security, 				   or consume excessive resources 
+			- What is AWS Shield - to prevent DDOS
+				1. AWS Shield is a managed DDOS protection service that safeguards web applications running on AWS. AWS Shield provided always-on detection and automatic inline 				   mitigations that minimise application downtime and latency, so there is no need to engage AWS support to benefit from DDOS protection. 
+			- There are two tiers of AWS shield - Standard and Advanced. 
+			- Advanced costs $3K per month per org. 
+			- Only Advanced offers automated application layer monitoring.
+			- What determines price for Lambda?
+				1. Request Pricing
+					- Free Tier: 1 million requests per month
+					- $0.20 per 1 million requests thereafter
+				2. Duration Pricing
+					- 400,000 GB-seconds per month free, up to 3.2 million seconds of compute time*
+					- $0.00001667 for every GB-second used thereafter
+				3. Additional Charges
+					- You may incur additional charges if your lambda functions uses other AWS services or transfers data. For example, If your lambda function reads and writes data to 					  or from Amazon S3, you will be billed for the read/write requests and the data stored in Amazon S3
